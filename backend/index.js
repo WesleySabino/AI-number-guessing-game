@@ -11,19 +11,25 @@ const PORT = process.env.PORT || 5000;
 
 // MySQL connection
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || 'db',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '', // Update with your password
+  password: process.env.DB_PASSWORD || 'root_password',
   database: process.env.DB_NAME || 'number_guessing_game',
 });
 
+function connectWithRetry() {
 db.connect((err) => {
   if (err) {
     console.error('Database connection failed:', err.stack);
+    console.log('Retrying in 5 seconds...');
+      setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
     return;
   }
   console.log('Connected to MySQL Database.');
 });
+}
+
+connectWithRetry();
 
 // Initialize game state
 let randomNumber = Math.floor(Math.random() * 100) + 1;
